@@ -573,9 +573,9 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
     """
     def load_data(dataset_name):
         if dataset_name == 'alpaca':
-            # return load_dataset("tatsu-lab/alpaca")
-            # return load_dataset("bbz662bbz/databricks-dolly-15k-ja-gozarinnemon") # ござるデータセットに変更
-            return load_dataset("yukiharada1228/robot-vision-qa") # ロボットビジョンデータセットに変更
+            return load_dataset("tatsu-lab/alpaca")
+        elif dataset_name == 'robot-vision':
+            return load_dataset("yukiharada1228/robot_vision_LLM") # ロボットビジョンデータセットを追加
         elif dataset_name == 'alpaca-clean':
             return load_dataset("yahma/alpaca-cleaned")
         elif dataset_name == 'chip2':
@@ -604,7 +604,7 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
     def format_dataset(dataset, dataset_format):
         if (
             dataset_format == 'alpaca' or dataset_format == 'alpaca-clean' or
-            (dataset_format is None and args.dataset in ['alpaca', 'alpaca-clean'])
+            (dataset_format is None and args.dataset in ['alpaca', 'alpaca-clean', 'robot-vision'])
         ):
             dataset = dataset.map(extract_alpaca_dataset, remove_columns=['instruction'])
         elif dataset_format == 'chip2' or (dataset_format is None and args.dataset == 'chip2'):
