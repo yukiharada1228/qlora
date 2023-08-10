@@ -311,10 +311,7 @@ def get_accelerate_model(args, checkpoint_dir):
     model = AutoModelForCausalLM.from_pretrained(
         args.model_name_or_path,
         cache_dir=args.cache_dir,
-        load_in_4bit=args.bits == 4,
-        load_in_8bit=args.bits == 8,
-        device_map=device_map,
-        max_memory=max_memory,
+        device_map="auto",
         trust_remote_code=args.trust_remote_code,
         use_auth_token=args.use_auth_token,
         low_cpu_mem_usage=True,
