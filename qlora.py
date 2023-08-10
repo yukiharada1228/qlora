@@ -516,10 +516,13 @@ def extract_unnatural_instructions_data(examples, extract_reformulations=False):
 
 ALPACA_PROMPT_DICT = {
     "input": (
-        "ユーザー: {instruction}<NL>システム: "
+        "以下は、タスクを説明する指示と、文脈のある入力の組み合わせです。要求を適切に満たす応答を書きなさい。"
+        "\n\n### 指示"
+        "\n{instruction}"
+        "\n\n### 応答"
     ),
     "output": (
-        "{output}</s>"
+        "{output}<|endoftext|>"
     ),
 }
 
