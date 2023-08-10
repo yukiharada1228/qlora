@@ -344,34 +344,7 @@ def get_accelerate_model(args, checkpoint_dir):
     model.config.torch_dtype=(torch.float32 if args.fp16 else (torch.bfloat16 if args.bf16 else torch.float32))
 
     # Tokenizer
-    tokenizer = AutoTokenizer.from_pretrained(
-        args.model_name_or_path,
-        cache_dir=args.cache_dir,
-        padding_side="right",
-        use_fast=False, # Fast tokenizer giving issues.
-        tokenizer_type='llama' if 'llama' in args.model_name_or_path else None, # Needed for HF name change
-        trust_remote_code=args.trust_remote_code,
-        use_auth_token=args.use_auth_token,
-    )
-    if tokenizer._pad_token is None:
-        smart_tokenizer_and_embedding_resize(
-            special_tokens_dict=dict(pad_token=DEFAULT_PAD_TOKEN),
-            tokenizer=tokenizer,
-            model=model,
-        )
-    if 'llama' in args.model_name_or_path or isinstance(tokenizer, LlamaTokenizer):
-        # LLaMA tokenizer may not have correct special tokens set.
-        # Check and add them if missing to prevent them from being parsed into different tokens.
-        # Note that these are present in the vocabulary.
-        # Note also that `model.config.pad_token_id` is 0 which corresponds to `<unk>` token.
-        print('Adding special tokens.')
-        tokenizer.add_special_tokens({
-                "eos_token": tokenizer.convert_ids_to_tokens(model.config.eos_token_id),
-                "bos_token": tokenizer.convert_ids_to_tokens(model.config.bos_token_id),
-                "unk_token": tokenizer.convert_ids_to_tokens(
-                    model.config.pad_token_id if model.config.pad_token_id != -1 else tokenizer.pad_token_id
-                ),
-        })
+    tokenizer = LlamaTokenizer.from_pretrained(tokenizer_id, additional_special_tokens=['▁▁'])
     
     if not args.full_finetune:
         model = prepare_model_for_kbit_training(model, use_gradient_checkpointing=args.gradient_checkpointing)
