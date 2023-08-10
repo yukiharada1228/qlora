@@ -515,14 +515,18 @@ def extract_unnatural_instructions_data(examples, extract_reformulations=False):
     return out
 
 ALPACA_PROMPT_DICT = {
-    "prompt_no_input": (
+    "input": (
         "ユーザー: {instruction}<NL>システム: "
+    ),
+    "output": (
+        "{output}</s>"
     ),
 }
 
 def extract_alpaca_dataset(example):
-    prompt_format = ALPACA_PROMPT_DICT["prompt_no_input"]
-    return {'input': prompt_format.format(**example)}
+    input_format = ALPACA_PROMPT_DICT["input"]
+    output_format = ALPACA_PROMPT_DICT["output"]
+    return {'input': input_format.format(**example), 'output': output_format.format(**example)}
 
 def local_dataset(dataset_name):
     if dataset_name.endswith('.json') or dataset_name.endswith('.jsonl'):
@@ -596,7 +600,7 @@ def make_data_module(tokenizer: transformers.PreTrainedTokenizer, args) -> Dict:
             dataset_format == 'alpaca' or dataset_format == 'alpaca-clean' or
             (dataset_format is None and args.dataset in ['alpaca', 'alpaca-clean', 'robot-vision'])
         ):
-            dataset = dataset.map(extract_alpaca_dataset, remove_columns=['instruction'])
+            dataset = dataset.map(extract_alpaca_dataset, remove_columns=['instruction', 'output'])
         elif dataset_format == 'chip2' or (dataset_format is None and args.dataset == 'chip2'):
             dataset = dataset.map(lambda x: {
                 'input': x['text'].split('\n<bot>: ')[0].replace('<human>: ', ''),
